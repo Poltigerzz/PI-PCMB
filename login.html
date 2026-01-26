@@ -1,16 +1,19 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="ca">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión</title>
+    <title>ACCÉS // TERMINAL</title>
     <link rel="stylesheet" href="login.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
+    <canvas id="matrix"></canvas>
+
     <div class="container">
         <div class="logo">
-            <h1>🔐 Login</h1>
-            <p>Bienvenido a tu aplicación</p>
+            <h1 class="glitch" data-text="ROOT@SISTEMA">ROOT@SISTEMA</h1>
+            <p class="subtitle">ACCÉS NO AUTORITZAT SERÀ REGISTRAT</p>
         </div>
 
         <div id="errorMessage" class="error-message"></div>
@@ -18,45 +21,42 @@
         <form method="POST" action="login.php" id="loginForm" onsubmit="return validateForm()">
             
             <div class="form-group">
-                <label for="username">Usuario o Email</label>
+                <label for="username">[ USUARI / CORREU ]</label>
                 <input 
                     type="text" 
                     id="username" 
                     name="username" 
-                    placeholder="Ingresa tu usuario o email"
+                    placeholder="INTRODUEIX L'IDENTIFICADOR..."
                     required
+                    autocomplete="off"
                 >
             </div>
 
             <div class="form-group">
-                <label for="password">Contraseña</label>
+                <label for="password">[ CONTRASENYA ]</label>
                 <input 
                     type="password" 
                     id="password" 
                     name="password" 
-                    placeholder="Ingresa tu contraseña"
+                    placeholder="************"
                     required
+                    autocomplete="off"
                 >
             </div>
 
             <div class="form-group checkbox">
-                <input 
-                    type="checkbox" 
-                    id="remember" 
-                    name="remember"
-                >
-                <label for="remember">Recuerda mis datos</label>
+                <input type="checkbox" id="remember" name="remember">
+                <label for="remember">MANTÉ LA SESSIÓ</label>
             </div>
 
-            <button type="submit" class="submit-btn">Iniciar Sesión</button>
-
+            <button type="submit" class="submit-btn">EXECUTA L'ACCÉS</button>
         </form>
 
-        <div class="divider">o</div>
+        <div class="divider">// OPCIONS DE BREtxA //</div>
 
         <div class="footer-links">
-            <a href="register.html">Regístrate</a>
-            <a href="forgot-password.html">¿Olvidaste tu contraseña?</a>
+            <a href="register.html">CREA USUARI NOU</a>
+            <a href="forgot-password.html">RECUPERA CREDENCIALS</a>
         </div>
     </div>
 
@@ -70,17 +70,17 @@
             errorDiv.textContent = '';
 
             if (!username) {
-                showError('Por favor ingresa tu usuario o email');
+                showError('CAL IDENTIFICADOR');
                 return false;
             }
 
             if (!password) {
-                showError('Por favor ingresa tu contraseña');
+                showError('CAL SEQÜÈNCIA DE CLAU');
                 return false;
             }
 
             if (password.length < 6) {
-                showError('La contraseña debe tener al menos 6 caracteres');
+                showError('LONGITUD DE CLAU INSUFICIENT (mín. 6)');
                 return false;
             }
 
@@ -89,14 +89,49 @@
 
         function showError(message) {
             const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = message;
+            errorDiv.textContent = '[!] ' + message;
             errorDiv.style.display = 'block';
         }
 
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            if (!validateForm()) {
-                e.preventDefault();
+        // Matrix rain background (el mateix codi d'abans)
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        canvas.height = window.innerHeight;
+        canvas.width = window.innerWidth;
+
+        const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン█▓▒░→←↑↓↔⚡★☆■□▪▫';
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+
+        const drops = Array(Math.floor(columns)).fill(1);
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#0f0';
+            ctx.font = fontSize + 'px Fira Code, monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                const x = i * fontSize;
+                const y = drops[i] * fontSize;
+
+                ctx.fillText(text, x, y);
+
+                if (y > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
             }
+        }
+
+        setInterval(draw, 35);
+
+        window.addEventListener('resize', () => {
+            canvas.height = window.innerHeight;
+            canvas.width = window.innerWidth;
         });
     </script>
 </body>
