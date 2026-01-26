@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Botones y Matrix</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <canvas id="matrix" width="800" height="600"></canvas>
+
+    <div class="card">
+        <div class="topbar">
+            <strong>🛡️ TEST - BOTONES Y MATRIX</strong>
+        </div>
+
+        <div class="logo">
+            <h1>TEST FUNCIONALIDAD</h1>
+            <p class="subtitle">Prueba de botones y animaciones</p>
+        </div>
+
+        <div class="services">
+            <div class="service">
+                <h3>🚀 Test Botón 1</h3>
+                <p class="small">Prueba para abrir modal</p>
+                <button type="button" class="submit-btn" onclick="alert('¡Botón 1 funcionando!')">Click Aquí</button>
+            </div>
+
+            <div class="service">
+                <h3>⚔️ Test Botón 2</h3>
+                <p class="small">Prueba para abrir modal</p>
+                <button type="button" class="submit-btn" onclick="alert('¡Botón 2 funcionando!')">Click Aquí</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="testModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="testTitle" style="margin: 0; color: #0f0;">MODAL TEST</h2>
+                <button type="button" class="close-modal" onclick="closeTestModal()">✕</button>
+            </div>
+            <p style="color: #0f0; margin: 1rem 0;">¡El modal está funcionando!</p>
+            <button type="button" onclick="closeTestModal()" style="background: #0f0; color: #000; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        // Matrix rain - Test Version
+        console.log('Iniciando matrix...');
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        
+        console.log('Canvas:', canvas);
+        console.log('Context:', ctx);
+
+        function resizeCanvas() {
+            canvas.height = window.innerHeight;
+            canvas.width = window.innerWidth;
+            console.log('Canvas redimensionado a:', canvas.width, 'x', canvas.height);
+        }
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン█▓▒░→←↑↓↔⚡★☆■□▪▫';
+        const fontSize = 14;
+        const columns = Math.floor(canvas.width / fontSize);
+        const drops = new Array(columns).fill(1);
+
+        console.log('Columnas:', columns);
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#0f0';
+            ctx.font = fontSize + 'px "Fira Code", monospace';
+
+            for (let i = 0; i < columns; i++) {
+                const char = chars.charAt(Math.floor(Math.random() * chars.length));
+                const x = i * fontSize;
+                const y = drops[i] * fontSize;
+
+                ctx.fillText(char, x, y);
+
+                if (y > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+
+                drops[i]++;
+            }
+        }
+
+        const interval = setInterval(drawMatrix, 35);
+        console.log('Matrix iniciada con intervalo:', interval);
+
+        // Test Modal
+        function closeTestModal() {
+            document.getElementById('testModal').classList.remove('active');
+            console.log('Modal cerrado');
+        }
+
+        // Agregar listeners a los botones
+        document.querySelectorAll('.submit-btn').forEach((btn, idx) => {
+            btn.addEventListener('click', () => {
+                console.log('Botón', idx + 1, 'clickeado');
+            });
+        });
+
+        console.log('✓ Todo está listo y funcionando');
+    </script>
+</body>
+</html>

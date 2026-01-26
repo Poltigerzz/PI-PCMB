@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <canvas id="matrix"></canvas>
+    <canvas id="matrix" width="800" height="600"></canvas>
 
     <div class="container">
         <div class="logo">
@@ -61,6 +61,7 @@
     </div>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
         function validateForm() {
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
@@ -132,6 +133,7 @@
         window.addEventListener('resize', () => {
             canvas.height = window.innerHeight;
             canvas.width = window.innerWidth;
+        });
         });
     </script>
 </body>

@@ -9,7 +9,7 @@
 </head>
 <body>
 
-  <canvas id="matrix"></canvas>
+  <canvas id="matrix" width="800" height="600"></canvas>
 
   <div class="card">
 
@@ -174,8 +174,10 @@
   </div>
 
   <script>
-    // Matrix rain
-    const canvas = document.getElementById('matrix');
+    // Esperar a que el DOM esté cargado
+    document.addEventListener('DOMContentLoaded', function() {
+      // Matrix rain
+      const canvas = document.getElementById('matrix');
     const ctx = canvas.getContext('2d');
 
     function resizeCanvas() {
@@ -212,6 +214,7 @@
     }
 
     setInterval(drawMatrix, 35);
+    });
   </script>
 
 </body>
