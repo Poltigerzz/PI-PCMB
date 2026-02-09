@@ -19,7 +19,7 @@ $response = array(
 
 // Si ya esta autenticado, redirigir al panel
 if (isset($_SESSION['user_id'])) {
-    header('Location: panel.php');
+    header('Location: panel-simple.php');
     exit();
 }
 
@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Si es exitoso, redirigir
     if ($response['success']) {
-        header('Location: panel.php');
+        header('Location: panel-simple.php');
         exit();
     }
 }
