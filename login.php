@@ -1,17 +1,21 @@
 <?php
 /**
- * Backend de Autenticación
+ * Backend de Autenticación - VERSIÓN MEJORADA
  * 
  * @package PHP-MBPC
  * @file login.php
- * @version 1.0.0
+ * @version 2.0.0
  */
 
 // ============================================
-// 1. Configuración y Sesión
+// IMPORTANTE: Evitar cualquier output antes de headers
 // ============================================
+error_reporting(E_ALL);
+ini_set('display_errors', 0); // No mostrar errores en la salida
+ini_set('log_errors', 1);
 
-session_start();
+// Incluir configuración global
+require_once __DIR__ . '/config.php';
 
 // Definir zona horaria
 date_default_timezone_set('Europe/Madrid');
@@ -177,7 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Si no es AJAX y fue exitoso, redirigir
     if ($response['success']) {
-        header('Location: ' . $response['redirect']);
+        redirect($response['redirect']);
         exit();
     }
     
@@ -192,7 +196,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // ============================================
 
 if (isset($_SESSION['user_id'])) {
-    header('Location: panel.php');
+    redirect('panel.php');
     exit();
 }
 

@@ -1,9 +1,10 @@
 <?php
-session_start();
+// Incluir configuración global
+require_once __DIR__ . '/config.php';
 
 // Comprovar si l'usuari està loguejat
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    redirect('login.php');
     exit;
 }
 

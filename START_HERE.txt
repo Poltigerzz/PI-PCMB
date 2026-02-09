@@ -1,0 +1,213 @@
+┌─────────────────────────────────────────────────────────────┐
+│  🛡️ CYBEREDU - LOGIN FIXED v2.0                              │
+│  Solución de Problemas de Login en Servidor                 │
+└─────────────────────────────────────────────────────────────┘
+
+⚡ INICIO RÁPIDO - LEE ESTO PRIMERO
+
+═══════════════════════════════════════════════════════════════
+
+📋 ¿QUÉ SE HA HECHO?
+
+Se corrigió un error crítico en logout.php que causaba problemas
+de redirección. Además se implementó un sistema de configuración
+centralizada (config.php) que detecta automáticamente la ruta del
+sitio, por lo que funciona en cualquier servidor.
+
+═══════════════════════════════════════════════════════════════
+
+🚀 PASOS PARA INSTALAR EN EL SERVIDOR
+
+1. Subir archivos:
+   rsync -avz ./ usuario@servidor:/ruta/publica/PI-PCMB/
+
+2. Verificar que funciona:
+   https://projecte.pcolmenarejo.com/diagnostico.php
+
+3. Probar login:
+   Usuario: admin
+   Contraseña: 123456
+
+═══════════════════════════════════════════════════════════════
+
+📖 DOCUMENTACIÓN
+
+Elige el documento que necesitas según tu nivel:
+
+NIVEL 1 - USUARIO/ADMIN (Para no programadores)
+├─ RESUMEN_SOLUCION.md       ← Empieza aquí si no sabes de PHP
+└─ INSTRUCCIONES_INSTALACION.md ← Pasos paso a paso para instalar
+
+NIVEL 2 - DESARROLLADOR (Para programadores)
+├─ CAMBIOS_v2.0.md           ← Qué cambió exactamente
+├─ SOLUCION_LOGIN_v2.md      ← Problemas y soluciones detalladas
+└─ FIXES_APPLIED.md          ← Versión anterior de cambios
+
+NIVEL 3 - TÉCNICO (Referencia técnica)
+├─ config.php                ← Lee el código fuente
+├─ .htaccess                 ← Reglas Apache
+└─ diagnostico.php           ← Herramienta de diagnóstico
+
+═══════════════════════════════════════════════════════════════
+
+✅ ARCHIVOS NUEVOS QUE DEBES SUBIR
+
+  ✅ config.php              (CRÍTICO - nueva)
+  ✅ .htaccess               (importante - nueva)
+  ✅ diagnostico.php         (importante - nueva)
+  ✅ test-login.html         (útil - nueva)
+  ✅ verificar-login.sh      (utilitario - nuevo)
+
+═══════════════════════════════════════════════════════════════
+
+✏️  ARCHIVOS QUE CAMBIARON
+
+  ✏️  logout.php             (CRÍTICO - FIJO)
+  ✏️  login.php              (importante)
+  ✏️  index.php              (importante)
+  ✏️  panel.php              (importante)
+
+═══════════════════════════════════════════════════════════════
+
+🧪 VERIFICAR QUE FUNCIONA (3 FORMAS)
+
+A) WEB (más fácil):
+   https://projecte.pcolmenarejo.com/diagnostico.php
+
+B) NAVEGADOR (con test):
+   https://projecte.pcolmenarejo.com/test-login.html
+
+C) TERMINAL (en el servidor):
+   bash verificar-login.sh
+
+═══════════════════════════════════════════════════════════════
+
+❌ SI SIGUE FALLANDO
+
+1. Ejecuta diagnostico.php
+   ↓
+2. Abre SOLUCION_LOGIN_v2.md sección "Solución de Problemas"
+   ↓
+3. Si aún falla, revisa:
+   /var/log/php-errors.log
+
+═══════════════════════════════════════════════════════════════
+
+🎯 EL PROBLEMA QUE SE ARREGLÓ
+
+  ANTES (INCORRECTO):
+  logout.php → header('Location: login.html')  ❌
+
+  AHORA (CORRECTO):
+  logout.php → require_once 'config.php'      ✅
+               → redirect('login.php')         ✅
+
+═══════════════════════════════════════════════════════════════
+
+💡 CARACTERÍSTICAS NUEVAS
+
+✨ Detección automática de ruta base
+✨ Funciona en / o en /subdirectorio/
+✨ Mejor seguridad de sesiones y cookies
+✨ Herramientas de diagnóstico incluidas
+✨ Reglas Apache para redirigir .html a .php
+
+═══════════════════════════════════════════════════════════════
+
+📞 SOPORTE RÁPIDO
+
+PREGUNTA: ¿Dónde empiezo?
+RESPUESTA: Lee RESUMEN_SOLUCION.md
+
+PREGUNTA: ¿Cómo instalo en el servidor?
+RESPUESTA: Sigue INSTRUCCIONES_INSTALACION.md
+
+PREGUNTA: ¿Por qué sigue fallando?
+RESPUESTA: Ejecuta diagnostico.php y lee SOLUCION_LOGIN_v2.md
+
+═══════════════════════════════════════════════════════════════
+
+🎓 ESTRUCTURA DEL PROYECTO
+
+📂 PI-PCMB/
+ ├─ 🆕 config.php                    ← Configuración centralizada
+ ├─ 🆕 .htaccess                     ← Reglas Apache
+ ├─ 🆕 diagnostico.php               ← Diagnóstico
+ ├─ ✏️  logout.php                    ← Arreglado
+ ├─ ✏️  login.php                     ← Mejorado
+ ├─ ✏️  index.php                     ← Mejorado
+ ├─ ✏️  panel.php                     ← Mejorado
+ ├─ 📖 RESUMEN_SOLUCION.md           ← LEE PRIMERO
+ ├─ 📖 INSTRUCCIONES_INSTALACION.md  ← PASOS
+ ├─ 📖 CAMBIOS_v2.0.md              ← TÉCNICO
+ ├─ 📖 SOLUCION_LOGIN_v2.md         ← COMPLETO
+ ├─ 🧪 test-login.html              ← Test
+ └─ ... otros archivos sin cambios
+
+═══════════════════════════════════════════════════════════════
+
+✨ NUEVA VERSIÓN DE CONFIG
+
+La nueva versión 2.0 incluye:
+
+  ┌─ Detección automática de protocolo (HTTP/HTTPS)
+  ├─ Detección de dominio y puerto
+  ├─ Detección de subdirectorio
+  ├─ Función redirect() global y segura
+  ├─ Configuración centralizada de sesiones
+  └─ Mejor seguridad de cookies
+
+Esto significa que el código funciona exactamente igual, sin
+importar si tu servidor está en:
+  • https://proyecte.pcolmenarejo.com/
+  • https://servidor.com/PI-PCMB/
+  • https://localhost:8080/proyecto/PI-PCMB/
+
+═══════════════════════════════════════════════════════════════
+
+🚀 FLUJO DE LOGIN (NUEVO)
+
+Usuario accede → config.php detecta ruta base autom. → redirect()
+sabe exactamente a dónde ir, independiente del servidor
+
+═══════════════════════════════════════════════════════════════
+
+💻 REQUISITOS MÍNIMOS
+
+✅ PHP >= 7.0
+✅ Módulo session
+✅ Función password_verify() (bcrypt)
+✅ Función header() para redirects
+⚡ (Opcional) Apache con mod_rewrite para .htaccess
+
+═══════════════════════════════════════════════════════════════
+
+🎯 PRÓXIMO PASO
+
+➤ Lee: RESUMEN_SOLUCION.md
+  o
+➤ Sigue: INSTRUCCIONES_INSTALACION.md
+
+═══════════════════════════════════════════════════════════════
+
+Preguntas frecuentes:
+
+Q: ¿Necesito cambiar algo en mi código?
+A: No, todo ya está hecho. Solo sube los archivos.
+
+Q: ¿Perderé datos?
+A: No, solo se actualizan archivos PHP.
+
+Q: ¿Cuánto tiempo toma instalar?
+A: 5 minutos (subir archivos) + 1 minuto (verificar)
+
+Q: ¿Y si algo falla?
+A: Ejecuta diagnostico.php para ver el problema.
+
+═══════════════════════════════════════════════════════════════
+
+Versión: 2.0
+Fecha: 2026-02-09
+Estado: ✅ LISTA PARA PRODUCCIÓN
+
+═══════════════════════════════════════════════════════════════

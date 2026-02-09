@@ -7,8 +7,8 @@
  * @version 1.0.0
  */
 
-// Iniciar sesión
-session_start();
+// Incluir configuración global
+require_once __DIR__ . '/config.php';
 
 // Definir zona horaria
 date_default_timezone_set('Europe/Madrid');
@@ -19,7 +19,7 @@ date_default_timezone_set('Europe/Madrid');
 
 if (!isset($_SESSION['user_id'])) {
     // No está autenticado, redirigir a login
-    header('Location: login.php');
+    redirect('login.php');
     exit();
 }
 
@@ -30,7 +30,7 @@ if (!isset($_SESSION['user_id'])) {
 if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     session_destroy();
     setcookie('username', '', time() - 3600, '/');
-    header('Location: login.php');
+    redirect('login.php');
     exit();
 }
 

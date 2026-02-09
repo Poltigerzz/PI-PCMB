@@ -1,5 +1,6 @@
 <?php
-session_start();
+// Incluir configuración global
+require_once __DIR__ . '/config.php';
 
 // Eliminar todas las variables de sesión
 $_SESSION = array();
@@ -11,6 +12,5 @@ session_destroy();
 setcookie('username', '', time() - 3600, '/');
 
 // Redirigir a login
-header('Location: login.html');
-exit;
+redirect('login.php');
 ?>

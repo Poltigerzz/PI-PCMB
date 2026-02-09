@@ -1,0 +1,52 @@
+# CyberEdu Login System - Apache Configuration
+# =============================================
+
+# Activar módulo rewrite si está disponible
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    
+    # Si intentan acceder a login.html, redirigir a login.php
+    RewriteCond %{REQUEST_FILENAME} login\.html$ 
+    RewriteRule ^login\.html$ login.php [L,R=301]
+    
+    # Si intentan acceder a register.html, mostrar página PHP
+    RewriteCond %{REQUEST_FILENAME} register\.html$
+    RewriteRule ^register\.html$ register.php [L,R=301]
+    
+    # Si intentan acceder a forgot-password.html, mostrar página PHP
+    RewriteCond %{REQUEST_FILENAME} forgot-password\.html$
+    RewriteRule ^forgot-password\.html$ forgot-password.php [L,R=301]
+    
+    # Prevenir acceso directo a archivos JSON
+    RewriteRule ^users\.json$ - [F,L]
+    
+    # Prevenir acceso directo al directorio logs
+    RewriteRule ^logs/ - [F,L]
+</IfModule>
+
+# Seguridad básica
+<FilesMatch "\.json$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Permitir solo lectura de estáticos
+<FilesMatch "\.(css|js|gif|jpg|jpeg|png|ico|svg|woff|woff2|ttf|eot)$">
+    Header set Cache-Control "max-age=31536000, public"
+</FilesMatch>
+
+# Desactivar listado de directorios
+Options -Indexes
+
+# Forzar UTF-8
+AddDefaultCharset UTF-8
+
+# Mejora de seguridad - no mostrar versión de PHP
+Header always unset X-Powered-By
+Header always unset Server
