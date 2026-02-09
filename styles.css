@@ -81,7 +81,7 @@ body::before {
     z-index: 1;
     transition: all 0.3s ease;
 }
-}
+
 
 .card:hover {
     box-shadow: 
@@ -118,7 +118,7 @@ body::before {
     border-bottom: 2px solid var(--neon);
     padding-bottom: 16px;
 }
-}
+
 
 @keyframes topbarGlow {
     0%, 100% { 
@@ -462,7 +462,7 @@ ol li, ul li {
   position: relative;
   overflow: hidden;
 }
-}
+
 
 @keyframes bigBtnPulse {
     0%, 100% {
@@ -706,7 +706,7 @@ ol li, ul li {
   position: relative;
   overflow: hidden;
 }
-}
+
 
 @keyframes buttonGlow {
     0%, 100% {

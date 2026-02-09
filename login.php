@@ -161,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             $response['success'] = true;
             $response['message'] = 'Login exitoso';
-            $response['redirect'] = 'index.html';
+            $response['redirect'] = 'panel.php';
             
             logEvent("Login exitoso para usuario: {$user['username']} desde {$_SERVER['REMOTE_ADDR']}", 'info');
         }
@@ -192,7 +192,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // ============================================
 
 if (isset($_SESSION['user_id'])) {
-    header('Location: index.html');
+    header('Location: panel.php');
     exit();
 }
 

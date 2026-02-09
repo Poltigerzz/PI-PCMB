@@ -28,7 +28,7 @@ $username = htmlspecialchars($_SESSION['username'] ?? 'Usuari desconegut', ENT_Q
             <strong>🛡️ Panell de Control</strong>
             <div style="display: flex; gap: 20px; align-items: center;">
                 <span style="background: rgba(0,255,0,0.1); padding: 8px 12px; border-radius: 4px; border-left: 3px solid #0f0;">Connectat com: <strong><?= $username ?></strong></span>
-                <a href="index.html" style="background: linear-gradient(135deg, rgba(0,255,0,0.2), rgba(0,255,0,0.1)); border: 2px solid #0f0; padding: 8px 12px; border-radius: 4px; color: #0f0; transition: all 0.3s; box-shadow: 0 0 10px rgba(0,255,0,0.2);" onmouseover="this.style.boxShadow='0 0 20px rgba(0,255,0,0.5), 0 0 30px rgba(0,255,0,0.3)'" onmouseout="this.style.boxShadow='0 0 10px rgba(0,255,0,0.2)'">← Torna al Inici</a>
+                <a href="index.php" style="background: linear-gradient(135deg, rgba(0,255,0,0.2), rgba(0,255,0,0.1)); border: 2px solid #0f0; padding: 8px 12px; border-radius: 4px; color: #0f0; transition: all 0.3s; box-shadow: 0 0 10px rgba(0,255,0,0.2);" onmouseover="this.style.boxShadow='0 0 20px rgba(0,255,0,0.5), 0 0 30px rgba(0,255,0,0.3)'" onmouseout="this.style.boxShadow='0 0 10px rgba(0,255,0,0.2)'">← Torna al Inici</a>
                 <a href="logout.php" style="transition: all 0.3s;" onmouseover="this.style.textShadow='0 0 10px #f44, 0 0 20px #f44'" onmouseout="this.style.textShadow=''">Tancar Sessió</a>
             </div>
         </div>
