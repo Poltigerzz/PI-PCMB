@@ -141,7 +141,7 @@ $remembered_username = isset($_COOKIE['username']) ? $_COOKIE['username'] : '';
             </div>
         <?php endif; ?>
 
-        <form method="POST" action="login.php" id="loginForm">
+        <form method="POST" action="" id="loginForm">
             
             <div class="form-group">
                 <label for="username">[ USUARI / CORREU ]</label>
