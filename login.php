@@ -1,115 +1,206 @@
 <?php
 /**
- * Backend de Autenticacion - SIMPLE VERSION
- * Sin dependencias externas
+ * Backend de Autenticación
+ * 
+ * @package PHP-MBPC
+ * @file login.php
+ * @version 1.0.0
  */
 
-// Iniciar sesion
+// ============================================
+// 1. Configuración y Sesión
+// ============================================
+
 session_start();
 
 // Definir zona horaria
 date_default_timezone_set('Europe/Madrid');
 
-// Respuesta JSON
-$response = array(
+// ============================================
+// 2. Funciones Auxiliares
+// ============================================
+
+/**
+ * Sanitizar entrada del usuario
+ * 
+ * @param string $input
+ * @return string
+ */
+function sanitize($input) {
+    return htmlspecialchars(stripslashes(trim($input)));
+}
+
+/**
+ * Validar email
+ * 
+ * @param string $email
+ * @return bool
+ */
+function validateEmail($email) {
+    return filter_var($email, FILTER_VALIDATE_EMAIL);
+}
+
+/**
+ * Registrar evento en log
+ * 
+ * @param string $message
+ * @param string $type
+ */
+function logEvent($message, $type = 'info') {
+    $timestamp = date('Y-m-d H:i:s');
+    $logFile = 'logs/auth.log';
+    
+    if (!file_exists('logs')) {
+        mkdir('logs', 0755, true);
+    }
+    
+    $logMessage = "[$timestamp] [$type] $message" . PHP_EOL;
+    file_put_contents($logFile, $logMessage, FILE_APPEND);
+}
+
+/**
+ * Obtener usuarios desde JSON
+ * 
+ * @return array
+ */
+function getUsers() {
+    $usersFile = 'users.json';
+    
+    if (!file_exists($usersFile)) {
+        logEvent('Archivo users.json no encontrado', 'error');
+        return [];
+    }
+    
+    $json = file_get_contents($usersFile);
+    $users = json_decode($json, true);
+    
+    if (!is_array($users)) {
+        logEvent('Error al decodificar users.json', 'error');
+        return [];
+    }
+    
+    return $users;
+}
+
+/**
+ * Buscar usuario por username o email
+ * 
+ * @param string $identifier Username o email
+ * @return array|null
+ */
+function findUser($identifier) {
+    $users = getUsers();
+    
+    foreach ($users as $user) {
+        if ($user['username'] === $identifier || $user['email'] === $identifier) {
+            return $user;
+        }
+    }
+    
+    return null;
+}
+
+// ============================================
+// 3. Procesar Autenticación
+// ============================================
+
+$response = [
     'success' => false,
     'message' => '',
     'redirect' => null
-);
+];
 
-// Si ya esta autenticado, redirigir al panel
-if (isset($_SESSION['user_id'])) {
-    header('Location: panel.php');
-    exit();
-}
-
-// Procesar POST
+// Verificar que sea una solicitud POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
-    $username = isset($_POST['username']) ? trim($_POST['username']) : '';
-    $password = isset($_POST['password']) ? $_POST['password'] : '';
+    // Obtener y sanitizar datos
+    $username = sanitize($_POST['username'] ?? '');
+    $password = $_POST['password'] ?? '';
     $remember = isset($_POST['remember']);
     
     // Validaciones
     if (empty($username)) {
         $response['message'] = 'El usuario o email es requerido';
+        logEvent("Intento de login sin usuario desde {$_SERVER['REMOTE_ADDR']}", 'warning');
     } 
     elseif (empty($password)) {
         $response['message'] = 'La contraseña es requerida';
+        logEvent("Intento de login sin contraseña desde {$_SERVER['REMOTE_ADDR']}", 'warning');
+    } 
+    elseif (strlen($password) < 6) {
+        $response['message'] = 'La contraseña debe tener al menos 6 caracteres';
     }
     else {
-        // Leer usuarios desde JSON
-        $users_file = 'users.json';
+        // Buscar usuario
+        $user = findUser($username);
         
-        if (file_exists($users_file)) {
-            $json_data = file_get_contents($users_file);
-            $users = json_decode($json_data, true);
+        if ($user === null) {
+            $response['message'] = 'Usuario o contraseña incorrecta';
+            logEvent("Intento de login fallido para: $username desde {$_SERVER['REMOTE_ADDR']}", 'warning');
+        }
+        elseif (!password_verify($password, $user['password'])) {
+            $response['message'] = 'Usuario o contraseña incorrecta';
+            logEvent("Contraseña incorrecta para usuario: {$user['username']} desde {$_SERVER['REMOTE_ADDR']}", 'warning');
+        }
+        else {
+            // Autenticación exitosa
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['email'] = $user['email'];
+            $_SESSION['name'] = $user['name'];
+            $_SESSION['role'] = $user['role'];
+            $_SESSION['logged_in'] = true;
+            $_SESSION['login_time'] = time();
+            $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
+            $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
             
-            if (is_array($users)) {
-                $user_found = null;
-                
-                // Buscar usuario
-                foreach ($users as $user) {
-                    if ($user['username'] === $username || $user['email'] === $username) {
-                        $user_found = $user;
-                        break;
-                    }
-                }
-                
-                // Verificar contraseña
-                if ($user_found !== null && password_verify($password, $user_found['password'])) {
-                    
-                    // Crear sesion
-                    $_SESSION['user_id'] = $user_found['id'];
-                    $_SESSION['username'] = $user_found['username'];
-                    $_SESSION['email'] = $user_found['email'];
-                    $_SESSION['role'] = $user_found['role'];
-                    
-                    $response['success'] = true;
-                    $response['message'] = 'Login exitoso';
-                    $response['redirect'] = 'panel.php';
-                    
-                    // Registrar login exitoso
-                    $ip = $_SERVER['REMOTE_ADDR'];
-                    $timestamp = date('Y-m-d H:i:s');
-                    $log_message = "[$timestamp] [info] Login exitoso para usuario: {$username} desde {$ip}\n";
-                    file_put_contents('logs/auth.log', $log_message, FILE_APPEND);
-                    
-                    if ($remember) {
-                        setcookie('username', $username, time() + (86400 * 30), '/');
-                    }
-                    
-                } else {
-                    $response['message'] = 'Usuario o contraseña incorrectos';
-                    
-                    // Registrar intento fallido
-                    $ip = $_SERVER['REMOTE_ADDR'];
-                    $timestamp = date('Y-m-d H:i:s');
-                    $log_message = "[$timestamp] [warning] Contraseña incorrecta para usuario: {$username} desde {$ip}\n";
-                    file_put_contents('logs/auth.log', $log_message, FILE_APPEND);
-                }
+            // Recordar datos si está marcado
+            if ($remember) {
+                setcookie('username', $user['username'], time() + (86400 * 30), '/'); // 30 días
             }
-        } else {
-            $response['message'] = 'Archivo de usuarios no encontrado';
+            
+            $response['success'] = true;
+            $response['message'] = 'Login exitoso';
+            $response['redirect'] = 'index.html';
+            
+            logEvent("Login exitoso para usuario: {$user['username']} desde {$_SERVER['REMOTE_ADDR']}", 'info');
         }
     }
     
-    // Si es AJAX, retornar JSON
-    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
-        header('Content-Type: application/json; charset=utf-8');
+    // Retornar respuesta JSON si es AJAX
+    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+        strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+        header('Content-Type: application/json');
         echo json_encode($response);
         exit();
     }
     
-    // Si es exitoso, redirigir
+    // Si no es AJAX y fue exitoso, redirigir
     if ($response['success']) {
-        header('Location: panel.php');
+        header('Location: ' . $response['redirect']);
         exit();
     }
+    
+} elseif ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    // Método no permitido
+    http_response_code(405);
+    die('Método no permitido');
 }
 
-// Cookie recordada
-$remembered_username = isset($_COOKIE['username']) ? $_COOKIE['username'] : '';
+// ============================================
+// 4. Verificar si ya está autenticado
+// ============================================
+
+if (isset($_SESSION['user_id'])) {
+    header('Location: index.html');
+    exit();
+}
+
+// ============================================
+// 5. Obtener username recordado si existe
+// ============================================
+
+$remembered_username = $_COOKIE['username'] ?? '';
 
 ?>
 <!DOCTYPE html>
@@ -117,115 +208,129 @@ $remembered_username = isset($_COOKIE['username']) ? $_COOKIE['username'] : '';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesion</title>
+    <title>Iniciar Sesión</title>
     <link rel="stylesheet" href="login.css">
 </head>
 <body>
-    <canvas id="matrix" width="800" height="600"></canvas>
-
     <div class="container">
         <div class="logo">
-            <h1 class="glitch" data-text="ROOT@SISTEMA">ROOT@SISTEMA</h1>
-            <p class="subtitle">ACCES NO AUTORITZAT SERA REGISTRAT</p>
+            <h1>🔐 Login</h1>
+            <p>Bienvenido a tu aplicación</p>
         </div>
 
-        <?php if (!empty($response['message']) && !$response['success']): ?>
-            <div class="error-message" style="display: block;">
+        <?php if (!$response['success'] && !empty($response['message'])): ?>
+            <div id="errorMessage" class="error-message" style="display: block;">
                 <?php echo htmlspecialchars($response['message']); ?>
             </div>
         <?php endif; ?>
 
-        <form method="POST" action="" id="loginForm">
+        <form method="POST" action="login.php" id="loginForm" onsubmit="return validateForm()">
             
             <div class="form-group">
-                <label for="username">[ USUARI / CORREU ]</label>
+                <label for="username">Usuario o Email</label>
                 <input 
                     type="text" 
                     id="username" 
                     name="username" 
-                    placeholder="INTRODUEIX L'IDENTIFICADOR..."
+                    placeholder="Ingresa tu usuario o email"
                     value="<?php echo htmlspecialchars($remembered_username); ?>"
                     required
-                    autocomplete="off"
                 >
             </div>
 
             <div class="form-group">
-                <label for="password">[ CONTRASENYA ]</label>
+                <label for="password">Contraseña</label>
                 <input 
                     type="password" 
                     id="password" 
                     name="password" 
-                    placeholder="***"
+                    placeholder="Ingresa tu contraseña"
                     required
-                    autocomplete="off"
                 >
             </div>
 
             <div class="form-group checkbox">
-                <input type="checkbox" id="remember" name="remember">
-                <label for="remember">RECUERDA CREDENCIALES</label>
+                <input 
+                    type="checkbox" 
+                    id="remember" 
+                    name="remember"
+                >
+                <label for="remember">Recuerda mis datos</label>
             </div>
 
-            <button type="submit" class="submit-btn">EXECUTA L'ACCES</button>
+            <button type="submit" class="submit-btn">Iniciar Sesión</button>
 
         </form>
 
-        <div class="divider">// OPCIONS DE BRETxA //</div>
+        <div class="divider">o</div>
 
         <div class="footer-links">
-            <a href="#">CREA USUARI NOU</a>
-            <a href="#">RECUPERA CREDENCIALS</a>
+            <a href="register.html">Regístrate</a>
+            <a href="forgot-password.html">¿Olvidaste tu contraseña?</a>
         </div>
 
-        <!-- Dades de prova  -->
-        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ccc; font-size: 12px; color: #666;">
-            <p><strong>Credencials de prova:</strong></p>
-            <p>Usuari: <code>admin</code> | Contrasenya: <code>123456</code></p>
-            <p>Usuari: <code>usuario</code> | Contrasenya: <code>123456</code></p>
+        <!-- Datos de prueba -->
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #999;">
+            <p><strong>Credenciales de prueba:</strong></p>
+            <p>Usuario: <code>admin</code> | Contraseña: <code>123456</code></p>
+            <p>Usuario: <code>usuario</code> | Contraseña: <code>123456</code></p>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const canvas = document.getElementById('matrix');
-            const ctx = canvas.getContext('2d');
+        function validateForm() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('errorMessage');
 
-            function resizeCanvas() {
-                canvas.height = window.innerHeight;
-                canvas.width = window.innerWidth;
+            // Limpiar mensajes previos
+            if (!errorDiv) {
+                const div = document.createElement('div');
+                div.id = 'errorMessage';
+                div.className = 'error-message';
+                document.querySelector('.container').insertBefore(div, document.querySelector('form'));
+            }
+
+            const error = document.getElementById('errorMessage');
+            error.style.display = 'none';
+            error.textContent = '';
+
+            if (!username) {
+                showError('Por favor ingresa tu usuario o email');
+                return false;
+            }
+
+            if (!password) {
+                showError('Por favor ingresa tu contraseña');
+                return false;
+            }
+
+            if (password.length < 6) {
+                showError('La contraseña debe tener al menos 6 caracteres');
+                return false;
+            }
+
+            return true;
+        }
+
+        function showError(message) {
+            let errorDiv = document.getElementById('errorMessage');
+            
+            if (!errorDiv) {
+                errorDiv = document.createElement('div');
+                errorDiv.id = 'errorMessage';
+                errorDiv.className = 'error-message';
+                document.querySelector('.container').insertBefore(errorDiv, document.querySelector('form'));
             }
             
-            resizeCanvas();
-            window.addEventListener('resize', resizeCanvas);
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
 
-            const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン█▓▒░→←↑↓↔⚡★☆■□▪▫';
-            const fontSize = 14;
-            const columns = Math.floor(canvas.width / fontSize);
-            const drops = new Array(columns).fill(1);
-
-            function draw() {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                ctx.fillStyle = '#0f0';
-                ctx.font = fontSize + 'px Fira Code, monospace';
-
-                for (let i = 0; i < columns; i++) {
-                    const text = chars.charAt(Math.floor(Math.random() * chars.length));
-                    const x = i * fontSize;
-                    const y = drops[i] * fontSize;
-
-                    ctx.fillText(text, x, y);
-
-                    if (y > canvas.height && Math.random() > 0.975) {
-                        drops[i] = 0;
-                    }
-                    drops[i]++;
-                }
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            if (!validateForm()) {
+                e.preventDefault();
             }
-
-            setInterval(draw, 35);
         });
     </script>
 </body>

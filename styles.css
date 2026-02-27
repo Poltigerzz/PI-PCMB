@@ -81,7 +81,7 @@ body::before {
     z-index: 1;
     transition: all 0.3s ease;
 }
-
+}
 
 .card:hover {
     box-shadow: 
@@ -118,7 +118,7 @@ body::before {
     border-bottom: 2px solid var(--neon);
     padding-bottom: 16px;
 }
-
+}
 
 @keyframes topbarGlow {
     0%, 100% { 
@@ -462,7 +462,7 @@ ol li, ul li {
   position: relative;
   overflow: hidden;
 }
-
+}
 
 @keyframes bigBtnPulse {
     0%, 100% {
@@ -706,7 +706,7 @@ ol li, ul li {
   position: relative;
   overflow: hidden;
 }
-
+}
 
 @keyframes buttonGlow {
     0%, 100% {
@@ -739,4 +739,195 @@ ol li, ul li {
   box-shadow: 
     0 0 10px rgba(0,255,0,0.4),
     inset 0 0 15px rgba(0,255,0,0.1);
+}
+{
+    --neon: #00ff41;
+    --bg: #050505;
+    --info: #00d4ff;
+    --alert: #ff3333;
+    --dark-green: #001100;
+    --border-green: #004400;
+}
+
+/* BASE */
+body {
+    background: var(--bg);
+    color: #fff;
+    font-family: 'Fira Code', monospace;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+/* NAVBAR */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 25px;
+    border-bottom: 2px solid var(--neon);
+    background: var(--dark-green);
+    box-shadow: 0 4px 15px rgba(0, 255, 65, 0.1);
+}
+
+.nav-btn {
+    background: transparent;
+    border: 1px solid var(--neon);
+    color: var(--neon);
+    padding: 6px 14px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 0.8rem;
+    transition: 0.3s;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+}
+
+.nav-btn:hover {
+    background: var(--neon);
+    color: #000;
+    box-shadow: 0 0 10px var(--neon);
+}
+
+.btn-home {
+    border-color: #888;
+    color: #ccc;
+    margin-left: 15px;
+}
+
+.btn-home:hover {
+    background: #444;
+    color: #fff;
+    border-color: #fff;
+}
+
+.btn-logout {
+    border-color: var(--alert);
+    color: var(--alert);
+}
+
+.btn-logout:hover {
+    background: var(--alert);
+    color: #000;
+    box-shadow: 0 0 15px var(--alert);
+}
+
+.agent-tag {
+    font-size: 0.7rem;
+    color: #666;
+    margin-right: 20px;
+    background: rgba(0, 255, 65, 0.05);
+    padding: 4px 10px;
+    border-radius: 3px;
+    border: 1px solid #003300;
+    display: flex;
+    align-items: center;
+}
+
+.agent-tag .dot {
+    height: 6px;
+    width: 6px;
+    background-color: var(--neon);
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+    box-shadow: 0 0 5px var(--neon);
+}
+
+/* CONTENIDOR PRINCIPAL I GRID */
+.main-container {
+    max-width: 1100px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid var(--neon);
+    background: rgba(0,10,0,0.9);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.tool-card {
+    border: 1px solid rgba(0, 255, 65, 0.2);
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+    background: rgba(0,0,0,0.5);
+}
+
+.tool-card:hover {
+    border-color: var(--neon);
+    background: rgba(0,255,65,0.1);
+    transform: translateY(-3px);
+}
+
+/* OUTPUT: TERMINAL I GRÀFIC */
+.output-container {
+    position: relative;
+    min-height: 450px;
+    border: 1px solid var(--border-green);
+    background: #000;
+    display: none;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background: var(--dark-green);
+    border-bottom: 1px solid var(--border-green);
+}
+
+.log-area {
+    padding: 20px;
+    height: 450px;
+    overflow-y: auto;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+#networkGraph {
+    width: 100%;
+    height: 450px;
+    display: none;
+    background: #000;
+}
+
+/* MODALS */
+.modal {
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.9);
+    align-items:center;
+    justify-content:center;
+    z-index:999;
+}
+
+.modal.active {
+    display:flex;
+}
+
+.modal-box {
+    border: 1px solid var(--neon);
+    background:#000;
+    padding:30px;
+    width:400px;
+    box-shadow: 0 0 20px var(--neon);
+}
+
+.modal-box input {
+    width:100%;
+    background:#000;
+    border:1px solid var(--border-green);
+    color:var(--neon);
+    padding:10px;
+    margin:10px 0;
+    outline:none;
+    font-family: inherit;
 }
